@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biz bilan bog'laning - Airwayz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #0056b3;
+            --accent-color: #00a8e8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: #dee2e6;
+            --card-bg: #ffffff;
+            --transition-speed: 0.3s;
+        }
+
+        .dark-mode {
+            --primary-color: #1e3a5f;
+            --secondary-color: #2c5282;
+            --accent-color: #4299e1;
+            --light-color: #2d3748;
+            --dark-color: #f7fafc;
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --border-color: #4a5568;
+            --card-bg: #2d3748;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Top Banner Section */
+        .top-banner {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 80px;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 10s ease;
+        }
+
+        .banner-img:hover {
+            transform: scale(1.05);
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 51, 102, 0.6), rgba(0, 51, 102, 0.8));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .banner-overlay h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .banner-overlay p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-menu li {
+            margin-left: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-speed) ease;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent-color);
+        }
+
+        .btn-login {
+            background-color: var(--accent-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .btn-login:hover {
+            background-color: #0090d0;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        /* Contact section */
+        .contact-section {
+            padding: 80px 0;
+            background-color: var(--bg-color);
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .contact-info {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .contact-icon {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .contact-details h4 {
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        .contact-form {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .contact-form h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        textarea.form-control {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #002244;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 60px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transition: box-shadow var(--transition-speed) ease;
+        }
+
+        /* Test Section Styles */
+        .test-section {
+            padding: 60px 0;
+            background-color: var(--light-color);
+            margin: 40px 0;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .test-header {
+            margin-bottom: 40px;
+        }
+
+        .test-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .test-header p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .test-start-btn {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 168, 232, 0.3);
+        }
+
+        .test-start-btn:hover {
+            background-color: #0090d0;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 168, 232, 0.4);
+        }
+
+        .test-start-btn:active {
+            transform: translateY(1px);
+        }
+
+        .test-content {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .test-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+
+        .test-question-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+            overflow: hidden;
+        }
+
+        .test-question-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .test-question-text {
+            font-size: 1.3rem;
+            margin: 20px;
+            text-align: left;
+        }
+
+        .test-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .test-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .test-option:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .test-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 51, 102, 0.1);
+        }
+
+        .option-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option-text {
+            flex-grow: 1;
+        }
+
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .test-progress {
+            width: 100%;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .test-progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .test-result {
+            display: none;
+            margin-top: 40px;
+            padding: 30px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 5px 20px var(--shadow-color);
+        }
+
+        .result-header {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .result-score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-pass {
+            color: var(--success-color);
+        }
+
+        .result-fail {
+            color: var(--danger-color);
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .result-image {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid var(--accent-color);
+        }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Animations */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-color);
+            top: 0;
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .correct-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: var(--success-color);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .wrong-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: var(--danger-color);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fireworks {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-section.about p {
+            color: #ddd;
+            line-height: 1.7;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            color: white;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .social-icons a:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 70px;
+                flex-direction: column;
+                background-color: var(--primary-color);
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+                padding: 20px 0;
+            }
+            
+            .nav-menu.active {
+                left: 0;
+            }
+            
+            .nav-menu li {
+                margin: 15px 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+                cursor: pointer;
+            }
+            
+            .menu-toggle .bar {
+                display: block;
+                width: 25px;
+                height: 3px;
+                margin: 5px auto;
+                background-color: white;
+                transition: all 0.3s ease;
+            }
+            
+            .top-banner {
+                height: 250px;
+            }
+            
+            .banner-overlay h1 {
+                font-size: 2rem;
+            }
+            
+            .test-question-image {
+                height: 200px;
+            }
+            
+            .test-option {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .option-letter {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1>Airwayz</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Bosh sahifa</a></li>
+                <li><a href="contact.html" class="active">Aloqa</a></li>
+                <li><a href="#" class="btn-login">Kirish / Ro'yxatdan o'tish</a></li>
+                <li class="theme-toggle" id="theme-toggle">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- TOP BANNER SECTION -->
+    <section class="top-banner">
+        <img src="images/banner1.jpg" 
+             alt="Airwayz samolyotlari" class="banner-img" id="mainBannerImg">
+        <div class="banner-overlay">
+            <h1>Airwayz - Havo Transporti va Logistika</h1>
+            <p>Dunyo bo'ylab ishonchli, samarali va barqaror yechimlar</p>
+            <button class="btn btn-primary" id="changeBannerBtn">
+                <i class="fas fa-sync-alt"></i> Rasmini o'zgartirish
+            </button>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Aloqa ma'lumotlari</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Manzilimiz</h4>
+                            <p>123 Aviatsiya yo'li, Skyport shahri<br>Qo'shma Shtatlar, 12345</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Telefon raqam</h4>
+                            <p>+1 (555) 123-4567</p>
+                            <p>+1 (555) 987-6543</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Elektron pochta</h4>
+                            <p>info@airwayz.com</p>
+                            <p>support@airwayz.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Ish vaqtlari</h4>
+                            <p>Dushanba - Juma: 8:00 - 20:00</p>
+                            <p>Shanba: 9:00 - 17:00</p>
+                            <p>Yakshanba: Dam olish kuni</p>
+                        </div>
+                    </div>
+                    <div class="social-icons" style="margin-top: 30px;">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>Xabar yuboring</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">To'liq ism</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Elektron pochta</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefon raqam</label>
+                            <input type="tel" id="phone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Mavzu</label>
+                            <input type="text" id="subject" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Xabar</label>
+                            <textarea id="message" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Xabarni yuborish</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- TEST BO'LIMI -->
+            <section class="test-section">
+                <div class="test-container">
+                    <div class="test-header">
+                        <h2>Airwayz Bilim Testi</h2>
+                        <p>Havo transporti va logistika sohasidagi bilimingizni sinab ko'ring. Har bir savol bilan birga tegishli rasm ham beriladi. 50 tasodifiy testdan iborat testni boshlash uchun quyidagi tugmani bosing.</p>
+                        <button class="test-start-btn" id="startTestBtn">
+                            <i class="fas fa-play-circle"></i> Testni Boshlash
+                        </button>
+                    </div>
+                    
+                    <div class="test-content" id="testContent">
+                        <div class="test-info">
+                            <div class="test-counter">
+                                <span id="currentQuestion">1</span> / <span id="totalQuestions">50</span>
+                            </div>
+                            <div class="test-timer">
+                                <i class="fas fa-clock"></i> <span id="timer">00:00</span>
+                            </div>
+                            <div class="test-score">
+                                To'g'ri: <span id="correctCount">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="test-progress">
+                            <div class="test-progress-bar" id="progressBar"></div>
+                        </div>
+                        
+                        <div class="test-question-container" id="questionContainer">
+                            <img class="test-question-image" id="questionImage" src="" alt="Savol rasmi">
+                            <div class="test-question-text" id="questionText">
+                                Savol bu yerda ko'rinadi...
+                            </div>
+                        </div>
+                        
+                        <div class="test-options" id="optionsContainer">
+                            <!-- Variantlar bu yerda ko'rinadi -->
+                        </div>
+                        
+                        <div class="test-navigation">
+                            <button class="btn" id="prevBtn" disabled>
+                                <i class="fas fa-arrow-left"></i> Oldingi
+                            </button>
+                            <button class="btn btn-primary" id="nextBtn">
+                                Keyingi <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="test-result" id="testResult">
+                        <h2 class="result-header">Test Natijalari</h2>
+                        <div class="result-score">
+                            <span id="finalScore">0</span>/50
+                        </div>
+                        <div class="result-message" id="resultMessage">
+                            Sizning natijangiz bu yerda ko'rsatiladi.
+                        </div>
+                        <div class="result-image">
+                            <img id="resultImage" src="" alt="Natija rasmi">
+                        </div>
+                        <button class="btn btn-primary" id="restartTestBtn">
+                            <i class="fas fa-redo"></i> Qayta Boshlash
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <div id="map"></div>
+        </div>
+    </section>
+
+    <!-- Animatsiyalar uchun elementlar -->
+    <div class="fireworks" id="fireworks"></div>
+    <div class="correct-animation" id="correctAnimation">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="wrong-animation" id="wrongAnimation">
+        <i class="fas fa-times-circle"></i>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section about">
+                    <h3>Airwayz haqida</h3>
+                    <p>Airwayz - havoda tashish va logistika yechimlarining yetakchi provayderi bo'lib, mukammallik, xavfsizlik va barqarorlikka sodiq.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section links">
+                    <h3>Tezkor havolalar</h3>
+                    <ul>
+                        <li><a href="index.html">Bosh sahifa</a></li>
+                        <li><a href="services.html">Xizmatlar</a></li>
+                        <li><a href="about.html">Biz haqimizda</a></li>
+                        <li><a href="contact.html">Aloqa</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section contact">
+                    <h3>Aloqa ma'lumotlari</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Aviatsiya yo'li, Skyport shahri</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@airwayz.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Airwayz. Barcha huquqlar himoyalangan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // MAHALLIY RASMLAR RO'YXATI
+        const bannerImages = [
+            "images/banner1.jpg",
+            "images/banner2.jpg",
+            "images/banner3.jpg",
+            "images/banner4.jpg"
+        ];
+
+        // TEST SAVOLLARI BAZASI (Mahalliy Rasmlar bilan)
+        const testQuestions = [
+            {
+                question: "Havo transportida IATA qanday tashkilotni anglatadi?",
+                options: [
+                    "International Air Transport Association",
+                    "International Aviation and Travel Association",
+                    "International Air Traffic Administration",
+                    "International Aircraft Technical Association"
+                ],
+                correct: 0,
+                image: "images/test1.png",
+                imageCaption: "Havo transporti tashkilotlari"
+            },
+            {
+                question: "Aviakompaniyalar qaysi turdagi samolyotni yuk tashish uchun ko'p ishlatadi?",
+                options: [
+                    "Airbus A380",
+                    "Boeing 747 Freighter",
+                    "Cessna 172",
+                    "Boeing 737 MAX"
+                ],
+                correct: 1,
+                image: "images/1.png",
+                imageCaption: "Yuk samolyotlari"
+            },
+            {
+                question: "Havo yuk tashishda 'ULD' nimani anglatadi?",
+                options: [
+                    "Unit Load Device",
+                    "Universal Loading Dock",
+                    "United Logistics Department",
+                    "Upper Level Deck"
+                ],
+                correct: 0,
+                image: "images/test3.png",
+                imageCaption: "Yuk konteynerlari"
+            },
+            {
+                question: "Havo transportida 'ETA' qisqartmasi nimani anglatadi?",
+                options: [
+                    "Estimated Time of Arrival",
+                    "Expected Travel Authorization",
+                    "Electronic Ticket Agreement",
+                    "Emergency Takeoff Authorization"
+                ],
+                correct: 0,
+                image: "images/test4.png",
+                imageCaption: "Havo transporti vaqt jadvallari"
+            },
+            {
+                question: "Qaysi transport turi eng tez xalqaro yuk tashishni ta'minlaydi?",
+                options: [
+                    "Temir yo'l transporti",
+                    "Dengiz transporti",
+                    "Havo transporti",
+                    "Avtomobil transporti"
+                ],
+                correct: 2,
+                image: "images/test5.png",
+                imageCaption: "Tez yuk tashish"
+            },
+            {
+                question: "Havo transportida 'Hub and Spoke' tizimi nima?",
+                options: [
+                    "Samolyotlarni texnik xizmat ko'rsatish tizimi",
+                    "Markaziy aeroport orqali yo'nalishlar tarmog'i",
+                    "Yuklarni ro'yxatga olish tizimi",
+                    "Yo'lovchilarni ro'yxatga olish tizimi"
+                ],
+                correct: 1,
+                image: "images/test6.png",
+                imageCaption: "Aeroport tarmog'i"
+            },
+            {
+                question: "Havo transportida 'Freight Forwarder' kimi ishlaydi?",
+                options: [
+                    "Samolyotni boshqaradi",
+                    "Yuk tashishni tashkil qiladi",
+                    "Aeroportda xavfsizlikni ta'minlaydi",
+                    "Yo'lovchilarga xizmat ko'rsatadi"
+                ],
+                correct: 1,
+                image: "images/test7.png",
+                imageCaption: "Yuk tashish tashkiloti"
+            },
+            {
+                question: "Qaysi turdagi yuklar havo transportida maxsus ruxsat talab qiladi?",
+                options: [
+                    "Qog'oz mahsulotlari",
+                    "Kiyim-kechak",
+                    "Xavfli materiallar",
+                    "Kitoblar"
+                ],
+                correct: 2,
+                image: "images/test8.png",
+                imageCaption: "Xavfli yuklar"
+            },
+            {
+                question: "Havo transportida 'Charter reys' nima?",
+                options: [
+                    "Davlat tomonidan boshqariladigan reys",
+                    "To'liq yoki qisman ijaraga olingan samolyot",
+                    "Yangi yo'nalishdagi birinchi reys",
+                    "Qidiruv-qutqaruv reysi"
+                ],
+                correct: 1,
+                image: "images/test9.png",
+                imageCaption: "Charter samolyotlari"
+            },
+            {
+                question: "Aeroportda 'Cargo Terminal' nima uchun xizmat qiladi?",
+                options: [
+                    "Yo'lovchilarni kutish uchun",
+                    "Yuklarni qabul qilish va jo'natish uchun",
+                    "Samolyotlarni ta'mirlash uchun",
+                    "Xodimlarni o'qitish uchun"
+                ],
+                correct: 1,
+                image: "images/test10.png",
+                imageCaption: "Yuk terminali"
+            },
+            {
+                question: "Havo yuk tashishda 'Waybill' nima?",
+                options: [
+                    "Yukni jo'natish va qabul qilish hujjati",
+                    "Samolyotning texnik pasporti",
+                    "Yo'lovchilarning ro'yxati",
+                    "Yuk narxini hisoblash jadvali"
+                ],
+                correct: 0,
+                image: "images/test11.png",
+                imageCaption: "Yuk hujjatlari"
+            },
+            {
+                question: "Havo transportida 'Intermodal' nima?",
+                options: [
+                    "Bir necha transport turlaridan foydalanish",
+                    "Xalqaro yo'nalishlar",
+                    "Ichki yo'nalishlar",
+                    "Faqat havo transporti"
+                ],
+                correct: 0,
+                image: "images/test12.png",
+                imageCaption: "Intermodal transport"
+            }
+        ];
+
+        // NATIJA RASMLARI (Mahalliy)
+        const resultImages = {
+            excellent: "images/result_excellent.png",
+            good: "images/result_good.png",
+            average: "images/result_average.png",
+            poor: "images/result_poor.png"
+        };
+
+        // RASM FUNKSIYALARI
+        let currentBannerIndex = 0;
+        const mainBannerImg = document.getElementById('mainBannerImg');
+        const changeBannerBtn = document.getElementById('changeBannerBtn');
+
+        // Banner rasmini o'zgartirish
+        changeBannerBtn.addEventListener('click', () => {
+            currentBannerIndex = (currentBannerIndex + 1) % bannerImages.length;
+            mainBannerImg.src = bannerImages[currentBannerIndex];
+        });
+
+        // TEST TIZIMI FUNKSIYALARI
+        let currentTestQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+        let timerInterval;
+        let seconds = 0;
+        let selectedOption = null;
+
+        // DOM elementlari
+        const startTestBtn = document.getElementById('startTestBtn');
+        const testContent = document.getElementById('testContent');
+        const testResult = document.getElementById('testResult');
+        const questionText = document.getElementById('questionText');
+        const questionImage = document.getElementById('questionImage');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const currentQuestionSpan = document.getElementById('currentQuestion');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const correctCountSpan = document.getElementById('correctCount');
+        const timerSpan = document.getElementById('timer');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const finalScoreSpan = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultImage = document.getElementById('resultImage');
+        const restartTestBtn = document.getElementById('restartTestBtn');
+        const correctAnimation = document.getElementById('correctAnimation');
+        const wrongAnimation = document.getElementById('wrongAnimation');
+        const fireworks = document.getElementById('fireworks');
+
+        // Testni boshlash
+        startTestBtn.addEventListener('click', startTest);
+
+        // Testni qayta boshlash
+        restartTestBtn.addEventListener('click', startTest);
+
+        // Oldingi savol
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+                updateNavigation();
+            }
+        });
+
+        // Keyingi savol
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < currentTestQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+                updateNavigation();
+            } else {
+                finishTest();
+            }
+        });
+
+        // Testni boshlash funksiyasi
+        function startTest() {
+            // Testni tasodifiy tanlash (12 ta - demo uchun, aslida 50 ta bo'lishi mumkin)
+            currentTestQuestions = [...testQuestions].sort(() => Math.random() - 0.5).slice(0, 12);
+            
+            // O'zgaruvchilarni qayta boshlash
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentTestQuestions.length).fill(null);
+            score = 0;
+            seconds = 0;
+            selectedOption = null;
+            
+            // UI ni sozlash
+            testContent.style.display = 'block';
+            testResult.style.display = 'none';
+            startTestBtn.style.display = 'none';
+            
+            // Taymerni boshlash
+            startTimer();
+            
+            // Birinchi savolni yuklash
+            loadQuestion();
+            updateNavigation();
+            
+            // Test ma'lumotlarini yangilash
+            totalQuestionsSpan.textContent = currentTestQuestions.length;
+            correctCountSpan.textContent = score;
+            
+            // Progress barni yangilash
+            updateProgressBar();
+        }
+
+        // Savolni yuklash
+        function loadQuestion() {
+            const question = currentTestQuestions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            questionImage.src = question.image;
+            questionImage.alt = question.imageCaption || "Savol rasmi";
+            
+            // Variantlarni tozalash
+            optionsContainer.innerHTML = '';
+            
+            // Variantlarni qo'shish
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'test-option';
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionElement.classList.add('selected');
+                }
+                
+                const optionLetter = document.createElement('div');
+                optionLetter.className = 'option-letter';
+                optionLetter.textContent = String.fromCharCode(65 + index);
+                
+                const optionText = document.createElement('div');
+                optionText.className = 'option-text';
+                optionText.textContent = option;
+                
+                optionElement.appendChild(optionLetter);
+                optionElement.appendChild(optionText);
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', () => selectOption(index, optionElement));
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Savol raqamini yangilash
+            currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            
+            // Oldingi tugmani yangilash
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // Keyingi tugma matnini yangilash
+            nextBtn.textContent = currentQuestionIndex === currentTestQuestions.length - 1 
+                ? 'Testni Yakunlash <i class="fas fa-flag-checkered"></i>' 
+                : 'Keyingi <i class="fas fa-arrow-right"></i>';
+            
+            // Progress barni yangilash
+            updateProgressBar();
+        }
+
+        // Variantni tanlash
+        function selectOption(index, element) {
+            // Avvalgi tanlangan variantni tozalash
+            document.querySelectorAll('.test-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Yangi variantni tanlash
+            element.classList.add('selected');
+            selectedOption = index;
+            userAnswers[currentQuestionIndex] = index;
+            
+            // Javobni tekshirish
+            const isCorrect = index === currentTestQuestions[currentQuestionIndex].correct;
+            
+            // Animatsiyani ko'rsatish
+            if (isCorrect) {
+                showCorrectAnimation();
+                score++;
+                correctCountSpan.textContent = score;
+            } else {
+                showWrongAnimation();
+            }
+            
+            // Keyingi tugmani faollashtirish
+            nextBtn.disabled = false;
+        }
+
+        // To'g'ri javob animatsiyasi
+        function showCorrectAnimation() {
+            correctAnimation.style.opacity = '1';
+            correctAnimation.style.transform = 'translate(-50%, -50%) scale(1)';
+            
+            // Konfetti animatsiyasi
+            createConfetti();
+            
+            setTimeout(() => {
+                correctAnimation.style.opacity = '0';
+                correctAnimation.style.transform = 'translate(-50%, -50%) scale(0.5)';
+            }, 1000);
+        }
+
+        // Noto'g'ri javob animatsiyasi
+        function showWrongAnimation() {
+            wrongAnimation.style.opacity = '1';
+            wrongAnimation.style.transform = 'translate(-50%, -50%) scale(1)';
+            
+            setTimeout(() => {
+                wrongAnimation.style.opacity = '0';
+                wrongAnimation.style.transform = 'translate(-50%, -50%) scale(0.5)';
+            }, 1000);
+        }
+
+        // Konfetti animatsiyasi
+        function createConfetti() {
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = confetti.style.width;
+                
+                document.body.appendChild(confetti);
+                
+                // Animatsiya
+                const animation = confetti.animate([
+                    { top: '0px', opacity: 1, transform: 'rotate(0deg)' },
+                    { top: '100vh', opacity: 0, transform: `rotate(${Math.random() * 360}deg)` }
+                ], {
+                    duration: Math.random() * 2000 + 1000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // Tasodifiy rang
+        function getRandomColor() {
+            const colors = ['#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE', 
+                          '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
+                          '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Taymerni boshlash
+        function startTimer() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        // Taymerni yangilash
+        function updateTimerDisplay() {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timerSpan.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Progress barni yangilash
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / currentTestQuestions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Navigatsiyani yangilash
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = userAnswers[currentQuestionIndex] === null;
+        }
+
+        // Testni yakunlash
+        function finishTest() {
+            clearInterval(timerInterval);
+            
+            // Yakuniy natijani hisoblash
+            const finalScore = score;
+            const totalQuestions = currentTestQuestions.length;
+            const percentage = (finalScore / totalQuestions) * 100;
+            
+            // Natijani ko'rsatish
+            testContent.style.display = 'none';
+            testResult.style.display = 'block';
+            finalScoreSpan.textContent = finalScore;
+            
+            // Natija xabarini belgilash
+            let message = '';
+            let resultClass = '';
+            let resultImg = '';
+            
+            if (percentage >= 90) {
+                message = "Ajoyib! Siz havo transporti sohasida juda yaxshi bilimga egasiz!";
+                resultClass = 'result-pass';
+                resultImg = resultImages.excellent;
+                showFireworks();
+            } else if (percentage >= 70) {
+                message = "Yaxshi! Havo transporti sohasida yaxshi bilimga egasiz.";
+                resultClass = 'result-pass';
+                resultImg = resultImages.good;
+            } else if (percentage >= 50) {
+                message = "Qoniqarli. Havo transporti sohasidagi bilimingizni yanada rivojlantirishingiz kerak.";
+                resultClass = 'result-fail';
+                resultImg = resultImages.average;
+            } else {
+                message = "Havo transporti sohasida bilimingizni oshirish uchun ko'proq o'qish kerak.";
+                resultClass = 'result-fail';
+                resultImg = resultImages.poor;
+            }
+            
+            resultMessage.innerHTML = `
+                <p>${message}</p>
+                <p>Siz ${totalQuestions} ta savoldan ${finalScore} tasiga to'g'ri javob berdingiz.</p>
+                <p>Bu ${percentage.toFixed(1)}% natijani anglatadi.</p>
+            `;
+            
+            // Natija rasmini o'rnatish
+            resultImage.src = resultImg;
+            resultImage.alt = "Natija rasmi";
+            
+            // Natija balliga rang berish
+            finalScoreSpan.className = `result-score ${resultClass}`;
+            
+            // Testni boshlash tugmasini qayta ko'rsatish
+            startTestBtn.style.display = 'inline-block';
+        }
+
+        // Salyutlar animatsiyasi
+        function showFireworks() {
+            fireworks.style.opacity = '1';
+            
+            // Bir nechta salyutlar yaratish
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFirework();
+                }, i * 300);
+            }
+            
+            // Animatsiyani to'xtatish
+            setTimeout(() => {
+                fireworks.style.opacity = '0';
+                fireworks.innerHTML = '';
+            }, 3000);
+        }
+
+        // Salyut yaratish
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.style.position = 'absolute';
+            firework.style.left = `${Math.random() * 80 + 10}%`;
+            firework.style.top = `${Math.random() * 80 + 10}%`;
+            firework.style.width = '10px';
+            firework.style.height = '10px';
+            firework.style.borderRadius = '50%';
+            firework.style.backgroundColor = getRandomColor();
+            firework.style.boxShadow = `0 0 20px ${getRandomColor()}`;
+            
+            fireworks.appendChild(firework);
+            
+            // Kengayish animatsiyasi
+            const expandAnimation = firework.animate([
+                { transform: 'scale(0)', opacity: 1 },
+                { transform: 'scale(20)', opacity: 0 }
+            ], {
+                duration: 1500,
+                easing: 'ease-out'
+            });
+            
+            expandAnimation.onfinish = () => firework.remove();
+        }
+
+        // QOLGAN FUNKSIYALAR (Tema, navigatsiya, va boshqalar)
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+        const loginBtn = document.querySelector('.btn-login');
+
+        // Tema o'zgartirish
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Mobil menyu
+        mobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Modal oynani ochish
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert("Kirish/Ro'yxatdan o'tish tizimi ishlab chiqilmoqda...");
+        });
+
+        // Aloqa formasi
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            alert(`Xabaringiz uchun rahmat, ${name}! Tez orada siz bilan bog'lanamiz.`);
+            this.reset();
+        });
+
+        // Xarita yaratish
+        const map = L.map('map').setView([40.7128, -74.0060], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        L.marker([40.7128, -74.0060]).addTo(map)
+            .bindPopup('<b>Airwayz Bosh Ofisi</b><br>123 Aviatsiya yo\'li, Skyport shahri')
+            .openPopup();
+
+        // Rasmlarni oldindan yuklash (cache qilish)
+        function preloadImages() {
+            const allImages = [
+                ...bannerImages,
+                ...Object.values(resultImages),
+                ...testQuestions.map(q => q.image)
+            ];
+            
+            allImages.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+
+        // Dastlabki yuklanishda rasmlarni cache qilish
+        document.addEventListener('DOMContentLoaded', () => {
+            preloadImages();
+        });
+    </script>
+</body>
+</html>
